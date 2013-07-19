@@ -37,7 +37,7 @@ class Gob(BasePlugin):
     ]
 
     def process(self, message, sender, command=None, *args):
-        if re.search(r'\bgob\b', re.I):
+        if re.search(r'\bg\.?o\.?b\.?\b', message, re.I):
             return choice(Gob.gobs)
 
 
