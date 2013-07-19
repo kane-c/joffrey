@@ -52,7 +52,13 @@ class Bot(sleekxmpp.ClientXMPP):
             self.plugin['xep_0045'].joinMUC(room, self.nick)
 
     def receive_message(self, msg):
-        pass
+        if msg['type'] not in ('chat', 'normal'):
+            return
+
+        reply = self.process_message(msg['body'], msg['from'])
+
+        if reply:
+            msg.reply(reply).send()
 
     def receive_message_muc(self, msg):
         """
