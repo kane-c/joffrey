@@ -1,0 +1,69 @@
+#Car parts
+#Things that make up an automobile (all in singular form)
+#by evd
+gasket
+head
+manifold
+radiator
+rotor
+piston
+connecting rod
+valve
+tie rod
+strut
+shock
+spring
+distributor
+carburetor
+bumper
+fender
+hood
+gas tank
+fuel line
+fuel filter
+air filter
+oil filter
+transmission
+axle
+differential
+muffler
+shock
+rocker panel
+hinge
+choke
+throttle
+spark plug
+grill
+headlight
+taillight
+wiper motor
+fuel injector
+oil cap
+fan belt
+antifreeze
+battery
+solenoid
+starter motor
+flywheel
+crankshaft
+oil ring
+piston ring
+cylinder
+engine block
+bearing
+main cap
+transaxle
+valve cover
+air cleaner
+throttle body
+metering rod
+fuel jet
+float bowl
+accelerator
+wheel
+tire
+caliper
+master cylinder
+dashboard
+speedometer
+tachometer
