@@ -91,7 +91,8 @@ class Bot(sleekxmpp.ClientXMPP):
         if message[0] == '!':
             parts = message[1:].partition(' ')
             args.append(parts[0].lower())
-            args.append(parts[2].split(' '))
+            for a in parts[2].split(' '):
+                args.append(a)
 
         sender = self.get_display_name(sender)
 
