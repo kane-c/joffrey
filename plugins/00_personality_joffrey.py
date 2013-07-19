@@ -12,7 +12,7 @@ class Joffrey(BasePlugin):
         'I\'ll tear your intestines out and feed them to the dire wolves',
     )
 
-    def process(self, message, sender):
+    def process(self, message, sender, command=None, *args):
         if 'joffrey' in message.lower():
             for s in Joffrey.swears:
                 if re.search(r'\b%s' % s, message, re.IGNORECASE):

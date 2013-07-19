@@ -10,7 +10,7 @@ class BasePlugin(object):
     name = 'Unnamed plugin'
     commands = {}
 
-    def process(self, message, sender):
+    def process(self, message, sender, command=None, *args):
         """
         Return a reply to use if the message should trigger the plugin. Return
         None to not reply

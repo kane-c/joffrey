@@ -7,7 +7,7 @@ class Ping(BasePlugin):
         '!ping': 'Test your connection'
     }
 
-    def process(self, message, sender):
+    def process(self, message, sender, command=None, *args):
         if message.lower() == '!ping':
             return 'Pong!'
 plugin_registry.register(Ping())

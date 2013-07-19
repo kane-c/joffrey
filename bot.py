@@ -29,8 +29,8 @@ class Bot(sleekxmpp.ClientXMPP):
         # The message event is triggered whenever a message
         # stanza is received. Be aware that that includes
         # MUC messages and error messages.
-        #self.add_event_handler("message", self.message)
-        self.add_event_handler('groupchat_message', self.receive_message)
+        self.add_event_handler('message', self.receive_message)
+        self.add_event_handler('groupchat_message', self.receive_message_muc)
 
     def start(self, event):
         """
@@ -52,6 +52,9 @@ class Bot(sleekxmpp.ClientXMPP):
             self.plugin['xep_0045'].joinMUC(room, self.nick)
 
     def receive_message(self, msg):
+        pass
+
+    def receive_message_muc(self, msg):
         """
         Process incoming message stanzas. Be aware that this also
         includes MUC messages and error messages. It is usually
@@ -68,15 +71,28 @@ class Bot(sleekxmpp.ClientXMPP):
         if msg['mucnick'] == self.nick:
             return
 
-        message = msg['body']
-        message = message.strip()
+        reply = self.process_message(msg['body'], msg['from'])
 
-        sender = self.get_display_name(msg['from'])
+        if reply:
+            self.say(reply, msg)
+
+    def process_message(self, message, sender):
+        message = message.strip()
+        args = [message, sender]
+
+        # Command support with messages starting with !
+        # Provides the whole message, command (lowercase) and any arguments
+        if message[0] == '!':
+            parts = message[1:].partition(' ')
+            args.append(parts[0].lower())
+            args.append(parts[2].split(' '))
+
+        sender = self.get_display_name(sender)
 
         reply = None
 
         for plugin in plugin_registry.plugins:
-            reply = plugin.process(message, sender)
+            reply = plugin.process(*args)
 
             if reply:
                 break
@@ -87,7 +103,9 @@ class Bot(sleekxmpp.ClientXMPP):
 
             if reply:
                 self.replies += 1
-                self.say(reply, msg)
+                reply = '{}: {}'.format(sender, reply)
+
+        return reply
 
     def get_display_name(self, name):
         name = str(name)
@@ -98,9 +116,8 @@ class Bot(sleekxmpp.ClientXMPP):
             return name
 
     def say(self, message, msg):
-        name = self.get_display_name(msg['from'])
         return self.send_message(mto=msg['from'].bare,
-                                 mbody='%s: %s' % (name, message,),
+                                 mbody=message,
                                  mtype='groupchat')
 
 if __name__ == '__main__':
