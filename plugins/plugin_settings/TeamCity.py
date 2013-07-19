@@ -7,4 +7,6 @@ TEAMCITY_BASE_URL = '{scheme}{server}/'.format(
     server=TEAMCITY_SERVER
 )
 
-TEAMCITY_PROJECT_LIST = TEAMCITY_BASE_URL+'/httpAuth/app/rest/projects'
+TEAMCITY_BUILD_LIST = TEAMCITY_BASE_URL+'httpAuth/app/rest/buildTypes'
+
+TEAMCITY_BUILD_RUN = TEAMCITY_BASE_URL+'httpAuth/action.html?add2Queue={build_id}'
