@@ -7,6 +7,9 @@ plugin_registry = PluginRegistry()
 
 
 class BasePlugin(object):
+    name = 'Unnamed plugin'
+    commands = {}
+
     def process(self, message, sender):
         """
         Return a reply to use if the message should trigger the plugin. Return
