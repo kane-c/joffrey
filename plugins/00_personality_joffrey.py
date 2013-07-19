@@ -4,6 +4,7 @@ from registry import BasePlugin, plugin_registry
 
 
 class Joffrey(BasePlugin):
+    name = 'Joffrey'
     swears = ('shit', 'fuck', 'suck', 'screw', 'ass', 'cunt')
     insults = (
         'Fuck you',
