@@ -8,23 +8,22 @@ import string
 
 class Phrangman(BasePlugin):
     count_rules = {3: 5, 4: 7, 'other': 12}
-    commands = ('hangman start', 'hangman area', 'hangman stop', 'hangman letter')
-    script_dir = ''
+    commands = ('start', 'area', 'stop', 'help')
 
     def __init__(self):
         self.reset()
-        self.script_dir = os.path.dirname(__file__)
+        script_dir = os.path.dirname(__file__)
 
         # Load Words Data
-        words_path = os.path.join(self.script_dir, 'data/words/')
-        for knowledge_area in os.listdir(words_path):
+        self.words_path = os.path.join(script_dir, 'data/words/')
+        for knowledge_area in os.listdir(self.words_path):
             self.knowledge_areas.append(knowledge_area)
 
         # Load 'graphic' elements ;)
-        hangman_images_path = os.path.join(self.script_dir, 'data/hangman/')
+        self.hangman_images_path = os.path.join(script_dir, 'data/hangman/')
         self.hangman_images = {}
-        for hangman_image in os.listdir(hangman_images_path):
-            f = open(os.path.join(hangman_images_path, hangman_image), "r")
+        for hangman_image in os.listdir(self.hangman_images_path):
+            f = open(os.path.join(self.hangman_images_path, hangman_image), "r")
             image = f.read()
             try:
                 self.hangman_images[int(hangman_image)] = image
@@ -64,11 +63,10 @@ class Phrangman(BasePlugin):
                 bad_tries += 1
 
         progression = int(bad_tries / self.getCountRule() * 100)
-        print (progression)
         if progression > 100:
             progression = 100
         progression = int((progression / 10)) * 10
-        print progression
+
         return progression
 
     def getHangProgressionImage(self, progression=10):
@@ -95,7 +93,7 @@ class Phrangman(BasePlugin):
                 return 'You haven\'t solved the other challange yet you stupid'
 
             if area_name in self.knowledge_areas:
-                lines = open(self.script_dir + '/data/words/' + area_name).read().splitlines()
+                lines = open(self.words_path + area_name).read().splitlines()
                 self.word = random.choice(lines)
                 msg_area = self.getHangProgressionImage()
                 mask = self.getWordMask()
@@ -120,20 +118,17 @@ class Phrangman(BasePlugin):
             else:
                 self.selected_characters.append(guess)
                 if self.wonYet():
-                    return 'CONGRATULATION! I KNOW PROMOTE YOU TO BECOME THE HAND OF THE KING!'
+                    return 'Congratulation! I now promote you to become Hand of the King!'
 
                 progression = self.getHangProgression()
                 game_progress_msg = self.getHangProgressionImage(progression)
 
                 if progression == 100:
-                    game_progress_msg += 'HAHAHA! GAME ENDED! YOU SHALL BE SERVED IDIOT!\n*CHOPPING SOUND*'
+                    game_progress_msg += 'Ha Ha Ha! Game Ended! You shall be served idiot!\n*Chopping Sound* (X_X) ... (==<'
                     self.reset()
                 else:
                     mask = self.getWordMask()
                     game_progress_msg += 'So far: ' + mask
                 return game_progress_msg
-
-#	def post_process(self, reply, message, sender):
-#		return '{}, peasant'.format(reply)
 
 plugin_registry.register(Phrangman())
