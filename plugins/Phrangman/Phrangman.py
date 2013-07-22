@@ -126,5 +126,7 @@ class Phrangman(BasePlugin):
                     mask = self.getWordMask()
                     game_progress_msg += 'So far: ' + mask
                 return game_progress_msg
+        elif '!hangman help' in message.lower():
+            return 'Available commands are\n!hangman start: to start a game\n!hangman area <name of knowledge>: to choose an area of prefer knowledge\n!hangman letter <letter>: to guess\n!hangman stop: to stop the game'
 
 plugin_registry.register(Phrangman())
