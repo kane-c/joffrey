@@ -13,6 +13,7 @@ class Phrangman(BasePlugin):
 
     def __init__(self):
         self.reset()
+        self.knowledge_areas = []
         self.count_rules = PHRANGMAN_COUNT_RULES if 'PHRANGMAN_COUNT_RULES' in globals() else {3: 5, 4: 7, 'other': 12}
         script_dir = os.path.dirname(__file__)
 
@@ -35,7 +36,6 @@ class Phrangman(BasePlugin):
         self.available_characters = string.ascii_letters
 
     def reset(self):
-        self.knowledge_areas = []
         self.word = ''
         self.selected_characters = []
 
