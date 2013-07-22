@@ -13,16 +13,16 @@ class Phrangman(BasePlugin):
 
     def __init__(self):
         self.reset()
-        self.count_rules = PHRANGMAN_COUNT_RULES if PHRANGMAN_COUNT_RULES in globals() else {3: 5, 4: 7, 'other': 12}
+        self.count_rules = PHRANGMAN_COUNT_RULES if 'PHRANGMAN_COUNT_RULES' in globals() else {3: 5, 4: 7, 'other': 12}
         script_dir = os.path.dirname(__file__)
 
         # Load Words Data
-        self.words_path = os.path.join(script_dir, PHRANGMAN_WORDS_PATH if PHRANGMAN_WORDS_PATH in globals() else 'data/words/')
+        self.words_path = os.path.join(script_dir, PHRANGMAN_WORDS_PATH if 'PHRANGMAN_WORDS_PATH' in globals() else 'data/words/')
         for knowledge_area in os.listdir(self.words_path):
             self.knowledge_areas.append(knowledge_area)
 
         # Load 'graphic' elements ;)
-        self.hangman_images_path = os.path.join(script_dir, PHRANGMAN_HANGMAN_IMAGES_PATH if PHRANGMAN_HANGMAN_IMAGES_PATH in globals() else 'data/words/')
+        self.hangman_images_path = os.path.join(script_dir, PHRANGMAN_HANGMAN_IMAGES_PATH if 'PHRANGMAN_HANGMAN_IMAGES_PATH' in globals() else 'data/words/')
         self.hangman_images = {}
         for hangman_image in os.listdir(self.hangman_images_path):
             f = open(os.path.join(self.hangman_images_path, hangman_image), "r")
@@ -92,7 +92,7 @@ class Phrangman(BasePlugin):
             for area in self.knowledge_areas:
                 if '.' not in area:
                     return_msg += area + ','
-            return_msg += ' or type !hangman help.'
+            return_msg += ' or type !hangman help'
             return return_msg
 
         elif '!hangman area' in message.lower():
