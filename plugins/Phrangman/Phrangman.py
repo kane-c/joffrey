@@ -1,26 +1,28 @@
 from __future__ import division
 from random import choice
 import re
+from plugins.plugin_settings.Phrangman import PHRANGMAN_COUNT_RULES
 from registry import BasePlugin, plugin_registry
 import os
 import random
 import string
 
 class Phrangman(BasePlugin):
-    count_rules = {3: 5, 4: 7, 'other': 12}
+
     commands = ('start', 'area', 'stop', 'help')
 
     def __init__(self):
         self.reset()
+        self.count_rules = PHRANGMAN_COUNT_RULES if PHRANGMAN_COUNT_RULES in globals() else {3: 5, 4: 7, 'other': 12}
         script_dir = os.path.dirname(__file__)
 
         # Load Words Data
-        self.words_path = os.path.join(script_dir, 'data/words/')
+        self.words_path = os.path.join(script_dir, PHRANGMAN_WORD_PATH if PHRANGMAN_WORD_PATH in globals() else 'data/words/')
         for knowledge_area in os.listdir(self.words_path):
             self.knowledge_areas.append(knowledge_area)
 
         # Load 'graphic' elements ;)
-        self.hangman_images_path = os.path.join(script_dir, 'data/hangman/')
+        self.hangman_images_path = os.path.join(script_dir, PHRANGMAN_HANGMAN_IMAGES_PATH if PHRANGMAN_HANGMAN_IMAGES_PATH in globals() else 'data/words/')
         self.hangman_images = {}
         for hangman_image in os.listdir(self.hangman_images_path):
             f = open(os.path.join(self.hangman_images_path, hangman_image), "r")
@@ -41,19 +43,13 @@ class Phrangman(BasePlugin):
         if self.word == '':
             return -1
         else:
-            if len(self.word) in self.count_rules:
-                return self.count_rules[len(self.word)]
-            else:
-                return self.count_rules['other']
+            return self.count_rules[len(self.word)] if len(self.word) in self.count_rules else self.count_rules['other']
 
     def getWordMask(self):
         mask = ''
         letter_choices = list(self.word)
         for letter in letter_choices:
-            if letter in self.selected_characters:
-                mask += letter.upper()
-            else:
-                mask += '_'
+            mask += letter.upper() if letter in self.selected_characters else '_'
         return mask
 
     def getHangProgression(self):
@@ -80,7 +76,7 @@ class Phrangman(BasePlugin):
 
     def process(self, message, sender, command=None, *args):
         if '!hangman start' == message.lower():
-            return_msg = 'Hahaha. You peasants will all be hang if you can\'t get it right.\nNow tell me which area of knowledges you want to challenge by typing "hangman area <name of the area>":\n'
+            return_msg = 'Listen carefully. You peasants will all be hang if you can\'t get it right.\nNow tell me which area of knowledges you want to challenge:\n'
             for area in self.knowledge_areas:
                 return_msg += area + ','
             return return_msg
