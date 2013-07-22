@@ -39,6 +39,9 @@ class Phrangman(BasePlugin):
         self.word = ''
         self.selected_characters = []
 
+    def isGameOn(self):
+        return self.word != ''
+
     def getCountRule(self):
         if self.word == '':
             return -1
@@ -53,6 +56,9 @@ class Phrangman(BasePlugin):
         return mask
 
     def getHangProgression(self):
+        if not self.isGameOn():
+            return -1
+
         bad_tries = 0
         for l in self.selected_characters:
             if l not in self.word:
@@ -66,7 +72,10 @@ class Phrangman(BasePlugin):
         return progression
 
     def getHangProgressionImage(self, progression=10):
-        return '\n'+self.hangman_images[progression] + '\n\n'
+        if progression%10 == 0:
+            return '\n'+self.hangman_images[progression] + '\n\n'
+        else:
+            return ''
 
     def wonYet(self):
         for l in self.word:
@@ -76,17 +85,22 @@ class Phrangman(BasePlugin):
 
     def process(self, message, sender, command=None, *args):
         if '!hangman start' == message.lower():
+            if self.isGameOn() :
+                return 'You haven\'t solved the other Hangman challange yet.'
+
             return_msg = 'Listen carefully. You peasants will all be hang if you can\'t get it right.\nNow tell me which area of knowledges you want to challenge:\n'
             for area in self.knowledge_areas:
-                return_msg += area + ','
+                if '.' not in area:
+                    return_msg += area + ','
+            return_msg += ' or type !hangman help.'
             return return_msg
 
         elif '!hangman area' in message.lower():
+            if self.isGameOn() :
+                return 'You haven\'t solved the other Hangman challange yet.'
+
             message_words = message.lower().split()
             area_name = message_words[2]
-
-            if self.getHangProgression() < 100 and self.getHangProgression() > 0:
-                return 'You haven\'t solved the other challange yet you stupid'
 
             if area_name in self.knowledge_areas:
                 lines = open(self.words_path + area_name).read().splitlines()
@@ -97,13 +111,16 @@ class Phrangman(BasePlugin):
 
                 return msg_area
             else:
-                return 'Can\'t you read you peasant, well I guess not. Pick one of the areas that I have said above ^'
+                return 'Can\'t you read you peasant. Well I guess not. Puuhleese Pick one of the areas that I have said above ^'
 
         elif '!hangman stop' in message.lower():
             self.reset()
-            return 'SHAME ON YOU PEASANT! You dared to quit this Godly made game'
+            return 'Shame on you Peasants! You dared to quit this holy game'
 
         elif '!hangman letter' in message.lower():
+            if not self.isGameOn():
+                return 'You need to start the game first and choose an area of knowledge. Or should I just chop your head off now? teehee'
+
             message_words = message.lower().split()
             guess = message_words[2]
             if guess not in self.available_characters:
