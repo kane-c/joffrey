@@ -1,7 +1,7 @@
 from __future__ import division
 from random import choice
 import re
-from plugins.plugin_settings.Phrangman import PHRANGMAN_COUNT_RULES
+from plugins.plugin_settings.Phrangman import *
 from registry import BasePlugin, plugin_registry
 import os
 import random
@@ -17,7 +17,7 @@ class Phrangman(BasePlugin):
         script_dir = os.path.dirname(__file__)
 
         # Load Words Data
-        self.words_path = os.path.join(script_dir, PHRANGMAN_WORD_PATH if PHRANGMAN_WORD_PATH in globals() else 'data/words/')
+        self.words_path = os.path.join(script_dir, PHRANGMAN_WORDS_PATH if PHRANGMAN_WORDS_PATH in globals() else 'data/words/')
         for knowledge_area in os.listdir(self.words_path):
             self.knowledge_areas.append(knowledge_area)
 
