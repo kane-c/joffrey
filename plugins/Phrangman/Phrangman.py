@@ -107,7 +107,7 @@ class Phrangman(BasePlugin):
             return_msg = 'Listen carefully. You peasants will all be hang if you can\'t get it right.\nNow tell me which area of knowledges you want to challenge:\n\n'
             for area in self.knowledge_areas:
                 if '.' not in area:
-                    return_msg += '-' + area + '\n'
+                    return_msg += ' ' + area + '\n'
             return_msg += '\nFor example Type !hangman food or type !hangman help for more information'
             return return_msg
 
@@ -125,6 +125,20 @@ class Phrangman(BasePlugin):
 
             return msg_area
 
+        elif args[0] == 'guess':
+            if not self.isGameOn():
+                return 'You need to start the game first and choose a topic first Or should I just chop your head off now? teehee'
+            args.remove('guess')
+            guess_word = ''.join(args)
+
+            if guess_word.lower() == self.word.lower():
+                self.reset()
+                return 'Good guess! I now promote you to become Hand of the King'
+            else:
+                self.reset()
+                return 'Ha ha ha! What a risky and unpaid move.\nGame Ended! You shall be served idiot!\n*Chopping Sound* (X_X) ... (==<'
+
+
         elif args[0] == 'stop':
             self.reset()
             return 'Shame on you Peasants! You dared to quit this holy game'
@@ -140,7 +154,8 @@ class Phrangman(BasePlugin):
             else:
                 self.selected_characters.append(guess)
                 if self.wonYet():
-                    return 'Congratulation! I now promote you to become Hand of the King!'
+                    self.reset()
+                    return 'Congratulations! I now promote you to become Hand of the King!'
 
                 progression = self.getHangProgression()
                 game_progress_msg = self.getHangProgressionImage(progression)
@@ -153,8 +168,8 @@ class Phrangman(BasePlugin):
                     game_progress_msg += 'So far: ' + mask
                     game_progress_msg += '\nAvailable characters: ' + self.displayAvailableCharacters()
                 return game_progress_msg
-        elif args[0] == 'stop':
-            return 'Available commands are\n!hangman: to start a game\n!hangman foods: to start playing hangman with the topic foods\n!hangman a: to guess letter a\n!hangman stop: to stop the game'
+        elif args[0] == 'help':
+            return 'Available commands are\n!hangman: to start a game\n!hangman foods: to start playing hangman with the topic foods\n!hangman a: to guess letter a\n!hangman guess yamaha: to guess the word yamaha (you may get punished for wrong guess)\n!hangman stop: to stop the game'
         else :
             return 'Are you trying to hack this godly game or simply just retarded? Nice try'
 
