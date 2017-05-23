@@ -9,7 +9,9 @@ import string
 
 class Phrangman(BasePlugin):
 
-    commands = ('start', 'area', 'stop', 'help')
+    commands = {
+        '!hangman': 'Play the hangman game ^_^'
+    }
 
     def __init__(self):
         self.reset()
@@ -33,11 +35,11 @@ class Phrangman(BasePlugin):
             except ValueError:
                 pass
 
-        self.available_characters = string.ascii_letters
 
     def reset(self):
         self.word = ''
         self.selected_characters = []
+        self.available_characters = set([c for c in string.ascii_lowercase])
 
     def isGameOn(self):
         return self.word != ''
@@ -50,9 +52,11 @@ class Phrangman(BasePlugin):
 
     def getWordMask(self):
         mask = ''
-        letter_choices = list(self.word)
-        for letter in letter_choices:
-            mask += letter.upper() if letter in self.selected_characters else '_'
+        for letter in list(self.word.lower()):
+            if letter in self.selected_characters:
+                mask += letter.upper() + ' '
+            else:
+                mask += '    ' if letter == ' ' else '_ '
         return mask
 
     def getHangProgression(self):
@@ -83,55 +87,75 @@ class Phrangman(BasePlugin):
                 return False
         return True
 
-    def process(self, message, sender, command=None, *args):
-        if '!hangman start' == message.lower():
-            if self.isGameOn() :
-                return 'You haven\'t solved the other Hangman challange yet.'
+    def displayAvailableCharacters(self):
+        return_str = '[ '
+        sorted_avail = sorted(self.available_characters.difference(self.selected_characters),
+                              key=lambda item:(float('inf'), item))
+        for c in sorted_avail:
+            return_str += c + ' '
+        return return_str + ']'
 
-            return_msg = 'Listen carefully. You peasants will all be hang if you can\'t get it right.\nNow tell me which area of knowledges you want to challenge:\n'
+
+    def process(self, message, sender, command=None, *args):
+        if command != 'hangman': return
+        if len(args) == 1 and args[0] == '': args = []
+        args = [a.lower() for a in args]
+        if len(args) == 0:
+            if self.isGameOn() :
+                return 'Another hangman game is already in progress.'
+
+            return_msg = 'Listen carefully. You peasants will all be hang if you can\'t get it right.\nNow tell me which area of knowledges you want to challenge:\n\n'
             for area in self.knowledge_areas:
                 if '.' not in area:
-                    return_msg += area + ','
-            return_msg += ' or type !hangman help'
+                    return_msg += ' ' + area + '\n'
+            return_msg += '\nFor example Type !hangman food or type !hangman help for more information'
             return return_msg
 
-        elif '!hangman area' in message.lower():
+        elif args[0] in self.knowledge_areas:
             if self.isGameOn() :
                 return 'You haven\'t solved the other Hangman challange yet.'
 
-            message_words = message.lower().split()
-            area_name = message_words[2]
+            area_name = args[0]
+            lines = open(self.words_path + area_name).read().splitlines()
+            self.word = random.choice(lines)
+            msg_area = self.getHangProgressionImage()
+            mask = self.getWordMask()
+            msg_area += 'Solve this: ' + mask
+            msg_area += '\nAvailable characters: ' + self.displayAvailableCharacters()
 
-            if area_name in self.knowledge_areas:
-                lines = open(self.words_path + area_name).read().splitlines()
-                self.word = random.choice(lines)
-                msg_area = self.getHangProgressionImage()
-                mask = self.getWordMask()
-                msg_area += 'Solve this: ' + mask
+            return msg_area
 
-                return msg_area
+        elif args[0] == 'guess':
+            if not self.isGameOn():
+                return 'You need to start the game first and choose a topic first Or should I just chop your head off now? teehee'
+            args.remove('guess')
+            guess_word = ''.join(args)
+
+            if guess_word.lower() == self.word.lower():
+                self.reset()
+                return 'Good guess! I now promote you to become Hand of the King'
             else:
-                return 'Can\'t you read you peasant. Well I guess not. Puuhleese Pick one of the areas that I have said above ^'
+                self.reset()
+                return 'Ha ha ha! What a risky and unpaid move.\nGame Ended! You shall be served idiot!\n*Chopping Sound* (X_X) ... (==<'
 
-        elif '!hangman stop' in message.lower():
+
+        elif args[0] == 'stop':
             self.reset()
             return 'Shame on you Peasants! You dared to quit this holy game'
 
-        elif '!hangman letter' in message.lower():
+        elif args[0] in self.available_characters:
             if not self.isGameOn():
-                return 'You need to start the game first and choose an area of knowledge. Or should I just chop your head off now? teehee'
+                return 'You need to start the game first and choose a topic first Or should I just chop your head off now? teehee'
 
-            message_words = message.lower().split()
-            guess = message_words[2]
-            if guess not in self.available_characters:
-                return 'Hey, in my kingdom you are only allowed to use ASCHII characters'
+            guess = args[0]
 
             if guess in self.selected_characters:
                 return 'I guess you peasant has a short-term memory issue. You have already guessed that character before'
             else:
                 self.selected_characters.append(guess)
                 if self.wonYet():
-                    return 'Congratulation! I now promote you to become Hand of the King!'
+                    self.reset()
+                    return 'Congratulations! I now promote you to become Hand of the King!'
 
                 progression = self.getHangProgression()
                 game_progress_msg = self.getHangProgressionImage(progression)
@@ -142,8 +166,11 @@ class Phrangman(BasePlugin):
                 else:
                     mask = self.getWordMask()
                     game_progress_msg += 'So far: ' + mask
+                    game_progress_msg += '\nAvailable characters: ' + self.displayAvailableCharacters()
                 return game_progress_msg
-        elif '!hangman help' in message.lower():
-            return 'Available commands are\n!hangman start: to start a game\n!hangman area <name of knowledge>: to choose an area of prefer knowledge\n!hangman letter <letter>: to guess\n!hangman stop: to stop the game'
+        elif args[0] == 'help':
+            return 'Available commands are\n!hangman: to start a game\n!hangman foods: to start playing hangman with the topic foods\n!hangman a: to guess letter a\n!hangman guess yamaha: to guess the word yamaha (you may get punished for wrong guess)\n!hangman stop: to stop the game'
+        else :
+            return 'Are you trying to hack this godly game or simply just retarded? Nice try'
 
 plugin_registry.register(Phrangman())
